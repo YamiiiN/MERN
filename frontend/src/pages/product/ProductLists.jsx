@@ -3,15 +3,9 @@ import AdminSideBar from '../../layouts/AdminSideBar'
 
 import axios from 'axios';
 
-import DataTable from 'datatables.net-react';
-import DT from 'datatables.net-dt';
-import 'datatables.net-select-dt';
-import 'datatables.net-responsive-dt';
-DataTable.use(DT);
+import MUIDataTables from 'mui-datatables'
 
-import { MDBDataTable } from 'mdbreact';
-
-import { Button } from '@mui/material';
+import { Button, TableCell, TableRow } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -23,8 +17,9 @@ export default function ProductLists() {
 
     const tableData = products.map(product => (
         {
+            _id: product._id,
             image: (
-                <div style={{ display: 'flex', gap: 5, width: 110, overflowX: 'scroll', paddingRight:10, paddingLeft:10 }}>
+                <div style={{ display: 'flex', gap: 5, width: 110, overflowX: 'scroll', paddingRight: 10, paddingLeft: 10 }}>
                     {product.images.map(image => (
                         <img key={image._id} src={image.url} style={{ width: 100, height: 100, objectFit: 'contain' }} />
                     ))}
@@ -56,67 +51,83 @@ export default function ProductLists() {
         }
     }
 
-    const data = {
-        columns: [
-            {
-                label: 'Image',
-                field: 'image',
-                sort: 'asc',
-                width: 150,
-            },
-            {
-                label: 'Name',
-                field: 'name',
-                sort: 'asc',
-                width: 150,
-            },
-            {
-                label: 'Description',
-                field: 'description',
-                sort: 'asc',
-                width: 270,
-            },
-            {
-                label: 'Category',
-                field: 'category',
-                sort: 'asc',
-                width: 150,
-            },
-            {
-                label: 'Cost Price',
-                field: 'cost_price',
-                sort: 'asc',
-                width: 200,
-            },
-            {
-                label: 'Sell Price',
-                field: 'sell_price',
-                sort: 'asc',
-                width: 100,
-            },
-            {
-                label: 'Stock Quantity',
-                field: 'stock_quantity',
-                sort: 'asc',
-                width: 100,
-            },
-            {
-                label: 'Action',
-                field: 'action',
-                sort: 'asc',
-                width: 100,
-            },
-        ],
+    const columns = [
+        {
+            label: 'Image',
+            name: 'image',
+            options: {
+                display: false,
+                filter: false,
+            }
 
-        rows: tableData
-    }
+        },
+        {
+            label: 'Name',
+            name: 'name',
+            options: {
+                filter: true,
+                sort: true,
+                display: false,
+            }
+        },
+        {
+            label: 'Description',
+            name: 'description',
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+        {
+            label: 'Category',
+            name: 'category',
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+        {
+            label: 'Cost Price',
+            name: 'cost_price',
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+        {
+            label: 'Sell Price',
+            name: 'sell_price',
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+        {
+            label: 'Stock Quantity',
+            name: 'stock_quantity',
+            options: {
+                filter: true,
+                sort: true,
+            }
+        },
+        {
+            label: 'Action',
+            name: 'action',
+            options: {
+                filter: false,
+            }
+        }
+    ]
+
+
+
 
 
     useEffect(() => {
 
         getProducts();
 
-    })
+    }, [])
 
     const getProducts = async () => {
 
@@ -127,16 +138,75 @@ export default function ProductLists() {
 
     }
 
+
+    const bulkDelete = async (ids) => {
+        try {
+
+
+            const { data } = await axios.put(`http://localhost:5000/product/bulk/delete`, {
+                productIds: ids,
+            })
+
+            getProducts();
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
 
         <AdminSideBar>
 
-            <MDBDataTable             
-                striped
-                bordered
-                hover
-                data={data}
-                responsive
+
+            <MUIDataTables
+                title={"Products List"}
+                data={tableData}
+                columns={columns}
+                options={{
+
+                    expandableRows: true,
+                    responsive: 'standard',
+                    filterType: 'multiSelect',
+
+                    onRowSelectionChange: (currentRowsSelected, allRowsSelected, rowsSelected) => {
+                        // console.log(currentRowsSelected);
+                    },
+
+                    // PARA SA BULK DELETE
+                    onRowsDelete: ({ data }) => {
+                        const ids = data.map(d => (
+                            tableData[d.index]._id
+                        ))
+
+                        // console.log(ids)
+                        bulkDelete(ids);
+                    },
+
+                    // Expandable
+                    renderExpandableRow: (rowData, rowMeta) => {
+                        const colSpan = rowData.length + 1; 
+                        return (
+                            // <div>
+                            //     {rowData[0]}
+                            // </div>
+
+
+
+                            <TableRow>
+                                <TableCell colSpan={colSpan}>
+                                    {rowData[0]}
+                                </TableCell>
+                            </TableRow>
+
+                            
+
+                        )
+                    },
+
+
+                }}
+
             />
 
         </AdminSideBar>
