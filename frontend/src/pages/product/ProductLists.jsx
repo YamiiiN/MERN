@@ -167,7 +167,7 @@ export default function ProductLists() {
 
                     expandableRows: true,
                     responsive: 'standard',
-                    filterType: 'multiSelect',
+                    filterType: 'multiselect',
 
                     onRowSelectionChange: (currentRowsSelected, allRowsSelected, rowsSelected) => {
                         // console.log(currentRowsSelected);

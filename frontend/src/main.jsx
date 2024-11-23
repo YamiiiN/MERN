@@ -6,8 +6,26 @@ import App from './App.jsx'
 import 'mdb-react-ui-kit/dist/css/mdb.min.css';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
+import 'bootstrap-css-only/css/bootstrap.min.css';
+import 'mdbreact/dist/css/mdb.css';
+
+import { store, persistor } from './state/store';
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react';
+
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+
+    <Provider store={store}>
+
+      <PersistGate loading={null} persistor={persistor}>
+
+        <App />
+
+      </PersistGate>
+
+    </Provider>
+
   </StrictMode>,
-)
+);

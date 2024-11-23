@@ -2,10 +2,16 @@ import React from 'react'
 
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import { useNavigate } from "react-router-dom";
+import { auth } from '../utils/firebase';
 
 export default function AdminSideBar({ children }) {
 
     const navigate = useNavigate();
+
+    const logout = () => {
+        auth.signOut();
+        navigate('/login')
+    }
 
     return (
         <>
@@ -23,9 +29,11 @@ export default function AdminSideBar({ children }) {
                             <MenuItem onClick={() => navigate("/category/create")}> Create New </MenuItem>
                         </SubMenu>
 
-                        <MenuItem> Documentation </MenuItem>
+                        <MenuItem onClick={() => navigate("/orders")}> Orders </MenuItem>
 
-                        <MenuItem> Logout </MenuItem>
+                        <MenuItem
+                            onClick={logout}
+                        > Logout </MenuItem>
 
                     </Menu>
                 </Sidebar>
